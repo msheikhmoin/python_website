@@ -1,16 +1,29 @@
 import streamlit as st
 import base64
-
+import os
 
 st.set_page_config(page_title="My Website", layout="wide")
 
 def get_base64(file):
-    with open(file, "rb") as f:
+    file_path = os.path.join(os.path.dirname(__file__), file)  # Absolute path
+    if not os.path.exists(file_path):
+        st.error(f"⚠️ Error: File not found - {file_path}")
+        return None
+    with open(file_path, "rb") as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
+gif_path = os.path.join(os.path.dirname(__file__), "python_web/python.gif")
 
-gif_base64 = get_base64("python.gif")
+if os.path.exists(gif_path):
+    gif_base64 = get_base64(gif_path)
+    if gif_base64:
+        background_style = f'background: url("data:image/gif;base64,{gif_base64}") no-repeat center center fixed; background-size: cover;'
+    else:
+        background_style = 'background: #000000;'  # Fallback color if image fails
+else:
+    st.warning("⚠️ Background image not found, using fallback.")
+    background_style = 'background: url("https://your-image-hosting.com/python.gif") no-repeat center center fixed; background-size: cover;'  # Replace with actual hosted image URL
 
 st.markdown(
     f"""
@@ -18,8 +31,7 @@ st.markdown(
         @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600&display=swap');
 
         html, body, [data-testid="stAppViewContainer"] {{
-            background: url("data:image/gif;base64,{gif_base64}") no-repeat center center fixed;
-            background-size: cover;
+            {background_style}
             font-family: 'Raleway', sans-serif;
             color: white;
             text-align: center;
@@ -72,13 +84,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 st.markdown('<h1 class="title">🔥 Welcome to My Stylish Website 🔥</h1>', unsafe_allow_html=True)
 
-
-st.sidebar.title(" Navigation")
+st.sidebar.title("🚀 Navigation")
 page = st.sidebar.radio("Go to:", ["Home", "About", "Contact", "Features"])
-
 
 if page == "Home":
     st.subheader("🏡 Home Page")
@@ -97,7 +106,7 @@ elif page == "Features":
     st.subheader("🔥 Features")
     st.write("- 🏆 **Fully Responsive Design**")
     st.write("- 🎨 **Custom Gradient Background**")
-    st.write("-  **Interactive Sidebar Navigation**")
+    st.write("- 🚀 **Interactive Sidebar Navigation**")
     st.write("- 🎭 **Smooth Hover Effects**")
 
 elif page == "Contact":
@@ -106,6 +115,5 @@ elif page == "Contact":
     message = st.text_area("Your Message")
     if st.button("Send"):
         st.success(f"✅ Thank you, {name}! Your message has been received.")
-
 
 st.markdown('<div class="footer"><span class="footer-text">Built with ❤️ by Moin Sheikh</span></div>', unsafe_allow_html=True)
